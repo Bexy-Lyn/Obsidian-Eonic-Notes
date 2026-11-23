@@ -1,0 +1,23 @@
+{
+  "settings": {
+    "title": "Eonic Notes",
+    "tag": {
+      "name": "Note tag",
+      "description": "Only notes with this tag will be considered.",
+      "placeholder": "#eonic"
+    },
+    "hierarchy": {
+      "name": "Hierarchy",
+      "description": "Properties defining the timeline hierarchy, in order."
+    },
+    "optionalProperties": {
+      "name": "Optional properties",
+      "description": "Additional properties to display as columns."
+    },
+    "propertyPlaceholder": "Property name",
+    "addProperty": "Add property",
+    "moveUp": "Move up",
+    "moveDown": "Move down",
+    "removeProperty": "Remove property"
+  }
+}

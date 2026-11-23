@@ -1,11 +1,10 @@
 {
-	"id": "sample-plugin",
-	"name": "Sample Plugin",
-	"version": "1.0.0",
-	"minAppVersion": "1.0.0",
-	"description": "Demonstrates some of the capabilities of the Obsidian API.",
-	"author": "Obsidian",
-	"authorUrl": "https://obsidian.md",
-	"fundingUrl": "https://obsidian.md/pricing",
-	"isDesktopOnly": false
+  "id": "eonic-notes",
+  "name": "Eonic Notes",
+  "version": "1.0.0",
+  "minAppVersion": "1.0.0",
+  "description": "A different way to visualise hierarchy in your notes. Not only about earth's history.",
+  "author": "Bexy-Lyn",
+  "authorUrl": "https://github.com/Bexy-Lyn",
+  "isDesktopOnly": false
 }

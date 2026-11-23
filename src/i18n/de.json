@@ -1,0 +1,23 @@
+{
+  "settings": {
+    "title": "Eonic Notes",
+    "tag": {
+      "name": "Notiz-Tag",
+      "description": "Nur Notizen mit diesem Tag werden berücksichtigt.",
+      "placeholder": "#eonic"
+    },
+    "hierarchy": {
+      "name": "Hierarchie",
+      "description": "Eigenschaften, die die Hierarchie der Zeitleiste in ihrer Reihenfolge festlegen."
+    },
+    "optionalProperties": {
+      "name": "Optionale Eigenschaften",
+      "description": "Zusätzliche Eigenschaften, die als Spalten angezeigt werden."
+    },
+    "propertyPlaceholder": "Eigenschaftsname",
+    "addProperty": "Eigenschaft hinzufügen",
+    "moveUp": "Nach oben verschieben",
+    "moveDown": "Nach unten verschieben",
+    "removeProperty": "Eigenschaft entfernen"
+  }
+}

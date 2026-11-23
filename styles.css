@@ -1,8 +1,6 @@
-/*
-
-This CSS file will be included with your plugin, and
-available in the app when your plugin is enabled.
-
-If your plugin does not need CSS, delete this file.
-
-*/
+.setting-item.setting-item.eonic-notes-array-row .setting-item-info {
+  position: absolute;
+}
+.setting-item.setting-item.eonic-notes-array-row .setting-item-control input {
+  flex: 1;
+}
