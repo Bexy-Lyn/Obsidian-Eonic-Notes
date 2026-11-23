@@ -19,5 +19,22 @@
     "moveUp": "Move up",
     "moveDown": "Move down",
     "removeProperty": "Remove property"
+  },
+  "note": {
+    "create": "Create hierarchical note",
+    "untitled": "Untitled hierarchical Note",
+    "duration": "Duration",
+    "order": "Order",
+    "created": "Hierarchical note created",
+    "creationFailed": "Could not create hierarchical note",
+    "color": "Background color"
+  },
+  "colorEditor": {
+    "command": "Edit hierarchical note color",
+    "title": "Background color",
+    "description": "Choose the background color for this note in the timeline.",
+    "invalidNote": "The active note is not an hierarchical note.",
+    "saveFailed": "Could not save the background color.",
+    "close": "Close"
   }
 }

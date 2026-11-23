@@ -4,3 +4,29 @@
 .setting-item.setting-item.eonic-notes-array-row .setting-item-control input {
   flex: 1;
 }
+
+/* Eonic note color editor */
+
+.eonic-notes-color-modal .setting-item {
+  border-top: none;
+}
+
+.eonic-notes-color-preview {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  min-height: 90px;
+  margin: 16px 0;
+  padding: 16px;
+
+  border: 1px solid var(--background-modifier-border);
+  border-radius: var(--radius-m);
+
+  color: #172b36;
+  font-size: var(--font-ui-large);
+  font-weight: 600;
+  text-align: center;
+
+  overflow-wrap: anywhere;
+}

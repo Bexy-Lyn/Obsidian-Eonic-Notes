@@ -19,5 +19,22 @@
     "moveUp": "Nach oben verschieben",
     "moveDown": "Nach unten verschieben",
     "removeProperty": "Eigenschaft entfernen"
+  },
+  "note": {
+    "create": "Hierarchische Notiz erstellen",
+    "untitled": "Unbenannte hierarchische Notiz",
+    "duration": "Dauer",
+    "order": "Reihenfolge",
+    "created": "Hierarchische Notiz erstellt",
+    "creationFailed": "Hierarchische Notiz konnte nicht erstellt werden",
+    "color": "Hintergrundfarbe"
+  },
+  "colorEditor": {
+    "command": "Farbe der hierarchischen Notiz bearbeiten",
+    "title": "Hintergrundfarbe",
+    "description": "Wähle die Hintergrundfarbe dieser Notiz in der Zeitleiste.",
+    "invalidNote": "Die aktive Notiz ist keine hierarchische Notiz.",
+    "saveFailed": "Die Hintergrundfarbe konnte nicht gespeichert werden.",
+    "close": "Schließen"
   }
 }
