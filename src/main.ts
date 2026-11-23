@@ -1,8 +1,7 @@
-import { Plugin, Notice } from "obsidian";
+import { Plugin, Notice, MarkdownView, TFile } from "obsidian";
 import { EonicNoteCreator } from "./note-creator";
 import { t } from "./i18n";
 import { EonicColorEditorModal } from "./modals/color-editor";
-import { TFile } from "obsidian";
 
 import {
   DEFAULT_SETTINGS,
@@ -45,6 +44,76 @@ export default class EonicNotesPlugin extends Plugin {
     );
   }
 
+  private openColorEditor(file: TFile): void {
+    if (!this.isEonicNote(file)) return;
+
+    new EonicColorEditorModal(this.app, file).open();
+  }
+
+  private updateColorButtons(): void {
+    const leaves = this.app.workspace.getLeavesOfType("markdown");
+
+    for (const leaf of leaves) {
+      if (!(leaf.view instanceof MarkdownView)) {
+        continue;
+      }
+
+      const view = leaf.view;
+      const file = view.file;
+
+      // Find an existing button, if any.
+      let button = view.contentEl.querySelector<HTMLButtonElement>(
+        ".eonic-notes-header-color",
+      );
+
+      // Only show the button in editing mode
+      // and for notes with the configured tag.
+      if (!file || view.getMode() !== "source" || !this.isEonicNote(file)) {
+        button?.remove();
+        continue;
+      }
+
+      // Create the button once per editor.
+      if (!button) {
+        button = createEl("button");
+        button.className = "eonic-notes-header-color";
+        button.type = "button";
+
+        const propertiesEl = view.contentEl.querySelector(
+          ".metadata-container",
+        );
+
+        if (propertiesEl) {
+          propertiesEl.insertAdjacentElement("afterend", button);
+        } else {
+          // Fallback if the properties section is hidden.
+          view.contentEl.prepend(button);
+        }
+      }
+
+      // Update the button for the current note.
+      const currentFile = file;
+
+      const frontmatter =
+        this.app.metadataCache.getFileCache(file)?.frontmatter;
+
+      const savedColor = frontmatter?.color;
+
+      const color =
+        typeof savedColor === "string" && /^#[0-9a-fA-F]{6}$/.test(savedColor)
+          ? savedColor
+          : "#80CFE8";
+
+      button.style.backgroundColor = color;
+
+      button.setAttribute("aria-label", t("colorEditor.command"));
+
+      button.onclick = () => {
+        this.openColorEditor(currentFile);
+      };
+    }
+  }
+
   async onload() {
     await this.loadSettings();
 
@@ -78,7 +147,7 @@ export default class EonicNotesPlugin extends Plugin {
         }
 
         if (!checking) {
-          new EonicColorEditorModal(this.app, file).open();
+          this.openColorEditor(file);
         }
 
         return true;
@@ -86,6 +155,33 @@ export default class EonicNotesPlugin extends Plugin {
     });
 
     this.addSettingTab(new EonicNotesSettingTab(this.app, this));
+
+    // Initialize buttons once the workspace is ready.
+    this.app.workspace.onLayoutReady(() => {
+      this.updateColorButtons();
+    });
+
+    // Update when the active note changes.
+    this.registerEvent(
+      this.app.workspace.on("active-leaf-change", () =>
+        this.updateColorButtons(),
+      ),
+    );
+
+    // Update when files are opened.
+    this.registerEvent(
+      this.app.workspace.on("file-open", () => this.updateColorButtons()),
+    );
+
+    // Update when switching editor modes or layouts.
+    this.registerEvent(
+      this.app.workspace.on("layout-change", () => this.updateColorButtons()),
+    );
+
+    // Update after frontmatter changes.
+    this.registerEvent(
+      this.app.metadataCache.on("changed", () => this.updateColorButtons()),
+    );
   }
 
   async loadSettings() {

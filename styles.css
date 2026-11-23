@@ -30,3 +30,44 @@
 
   overflow-wrap: anywhere;
 }
+
+/* Color button at the top of Eonic notes */
+
+.eonic-notes-header-color {
+  display: block;
+  margin: 0 auto;
+  width: 100%;
+  padding: 10px 16px;
+  max-width: var(--content-line-width);
+
+  border: none;
+  border-radius: var(--radius-m);
+
+  font-size: var(--font-ui-small);
+  font-weight: 600;
+  text-align: center;
+
+  cursor: pointer;
+
+  transition:
+    filter 150ms ease,
+    transform 150ms ease;
+}
+
+.eonic-notes-header-color:hover {
+  filter: brightness(0.94);
+}
+
+.eonic-notes-header-color:active {
+  transform: scale(0.995);
+}
+
+.eonic-notes-header-color:focus-visible {
+  outline: 2px solid var(--interactive-accent);
+  outline-offset: 2px;
+}
+
+/* Extra safeguard for reading mode */
+.markdown-reading-view .eonic-notes-header-color {
+  display: none;
+}
