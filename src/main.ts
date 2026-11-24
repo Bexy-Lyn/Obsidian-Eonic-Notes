@@ -2,6 +2,7 @@ import { Plugin, Notice, MarkdownView, TFile } from "obsidian";
 import { EonicNoteCreator } from "./note-creator";
 import { t } from "./i18n";
 import { EonicColorEditorModal } from "./modals/color-editor";
+import { EonicBlock } from "./visualization/eonic-block";
 
 import {
   DEFAULT_SETTINGS,
@@ -159,6 +160,10 @@ export default class EonicNotesPlugin extends Plugin {
     // Initialize buttons once the workspace is ready.
     this.app.workspace.onLayoutReady(() => {
       this.updateColorButtons();
+    });
+
+    this.registerMarkdownCodeBlockProcessor("eonic", (source, el, ctx) => {
+      ctx.addChild(new EonicBlock(el, this.app, source, () => this.settings));
     });
 
     // Update when the active note changes.

@@ -36,5 +36,11 @@
     "invalidNote": "The active note is not an hierarchical note.",
     "saveFailed": "Could not save the background color.",
     "close": "Close"
+  },
+  "visualization": {
+    "noNotes": "No matching Eonic notes found.",
+    "invalidOptions": "Invalid Eonic code block options.",
+    "unknownView": "Unsupported Eonic visualization.",
+    "emptyHierarchy": "Configure at least one hierarchy property."
   }
 }

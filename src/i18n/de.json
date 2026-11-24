@@ -36,5 +36,11 @@
     "invalidNote": "Die aktive Notiz ist keine hierarchische Notiz.",
     "saveFailed": "Die Hintergrundfarbe konnte nicht gespeichert werden.",
     "close": "Schließen"
+  },
+  "visualization": {
+    "noNotes": "Keine passenden eonischen Notizen gefunden.",
+    "invalidOptions": "Ungültige Optionen im Eonic-Codeblock.",
+    "unknownView": "Nicht unterstützte Eonic-Visualisierung.",
+    "emptyHierarchy": "Konfiguriere mindestens eine Hierarchieeigenschaft."
   }
 }
