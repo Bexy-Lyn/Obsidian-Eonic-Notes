@@ -42,6 +42,7 @@
     "noNotes": "No matching Eonic notes found.",
     "invalidOptions": "Invalid Eonic code block options.",
     "unknownView": "Unsupported Eonic visualization.",
-    "emptyHierarchy": "Configure at least one hierarchy property."
+    "emptyHierarchy": "Configure at least one hierarchy property.",
+    "level": "Level"
   }
 }

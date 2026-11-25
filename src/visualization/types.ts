@@ -4,6 +4,7 @@ export interface EonicBlockOptions {
   view: string;
   tag?: string;
   order: EonicSortOrder;
+  properties?: string[];
 }
 
 export interface EonicNote {
@@ -42,3 +43,14 @@ export interface EonicNote {
 }
 
 export type EonicSortOrder = "asc" | "desc";
+
+export interface RawEonicNote {
+  file: TFile;
+  title: string;
+  frontmatter: Record<string, unknown>;
+}
+
+export interface EonicSchema {
+  hierarchy: string[];
+  optionalProperties: string[];
+}

@@ -1,7 +1,6 @@
 import { App, getAllTags } from "obsidian";
 
-import type { EonicNotesSettings } from "../settings";
-import type { EonicNote } from "./types";
+import type { RawEonicNote, EonicNote, EonicSchema } from "./types";
 
 function normalizeTag(tag: string): string {
   return "#" + tag.trim().replace(/^#+/, "").toLowerCase();
@@ -12,14 +11,16 @@ function readNumber(value: unknown, fallback: number): number {
     return fallback;
   }
 
-  if (value === "") return fallback;
+  if (typeof value === "string" && !value.trim()) {
+    return fallback;
+  }
 
   const number = Number(value);
 
   return Number.isFinite(number) ? number : fallback;
 }
 
-function readText(value: unknown): string {
+export function readText(value: unknown): string {
   if (value === null || value === undefined) {
     return "";
   }
@@ -28,27 +29,28 @@ function readText(value: unknown): string {
     return value.map(readText).join(", ");
   }
 
+  if (typeof value === "object") {
+    return JSON.stringify(value) ?? "";
+  }
+
   return String(value).trim();
 }
 
-export function collectEonicNotes(
+// Collect notes without interpreting their properties.
+export function collectRawEonicNotes(
   app: App,
-  settings: EonicNotesSettings,
+  requiredTag: string,
   additionalTag?: string,
-): EonicNote[] {
-  const notes: EonicNote[] = [];
+): RawEonicNote[] {
+  if (!requiredTag.trim()) return [];
 
-  if (!settings.tag.trim()) return notes;
-
-  const requiredTag = normalizeTag(settings.tag);
+  const baseTag = normalizeTag(requiredTag);
 
   const filterTag = additionalTag?.trim()
     ? normalizeTag(additionalTag)
     : undefined;
 
-  const hierarchy = settings.hierarchy.map((key) => key.trim()).filter(Boolean);
-
-  if (hierarchy.length === 0) return notes;
+  const notes: RawEonicNote[] = [];
 
   for (const file of app.vault.getMarkdownFiles()) {
     const cache = app.metadataCache.getFileCache(file);
@@ -57,40 +59,58 @@ export function collectEonicNotes(
 
     const tags = (getAllTags(cache) ?? []).map(normalizeTag);
 
-    if (!tags.includes(requiredTag)) continue;
+    if (!tags.includes(baseTag)) continue;
 
     if (filterTag && !tags.includes(filterTag)) {
       continue;
     }
 
-    const fm = cache.frontmatter ?? {};
+    notes.push({
+      file,
+      title: file.basename,
+      frontmatter: cache.frontmatter ?? {},
+    });
+  }
 
-    // Collect the ancestors until the first
-    // empty hierarchy property.
+  return notes;
+}
+
+// Interpret the raw notes using a discovered schema.
+export function normalizeEonicNotes(
+  rawNotes: RawEonicNote[],
+  schema: EonicSchema,
+): EonicNote[] {
+  const titles = new Set(rawNotes.map((note) => note.title));
+
+  const notes: EonicNote[] = [];
+
+  for (const raw of rawNotes) {
+    const fm = raw.frontmatter;
+
     const ancestors: string[] = [];
 
-    for (const key of hierarchy) {
-      const value = readText(fm[key]);
+    for (const key of schema.hierarchy) {
+      const value = fm[key];
 
-      if (!value) break;
+      if (
+        typeof value !== "string" ||
+        !titles.has(value) ||
+        value === raw.title
+      ) {
+        break;
+      }
 
       ancestors.push(value);
     }
 
-    // A note needs an available hierarchy level
-    // for its own title.
-    if (ancestors.length >= hierarchy.length) {
+    if (ancestors.length >= schema.hierarchy.length) {
       continue;
     }
 
     const properties: Record<string, string> = Object.create(null);
 
-    for (const property of settings.optionalProperties) {
-      const key = property.trim();
-
-      if (key) {
-        properties[key] = readText(fm[key]);
-      }
+    for (const key of schema.optionalProperties) {
+      properties[key] = readText(fm[key]);
     }
 
     const color =
@@ -99,15 +119,17 @@ export function collectEonicNotes(
         : "#80CFE8";
 
     notes.push({
-      file,
-      title: file.basename,
+      file: raw.file,
+      title: raw.title,
       description: readText(fm.description),
+
       ancestors,
       level: ancestors.length,
 
       duration: Math.max(0, readNumber(fm.duration, 0)),
 
       order: readNumber(fm.order, 1),
+
       color,
       properties,
     });

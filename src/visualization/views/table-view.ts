@@ -1,7 +1,6 @@
 import type { App } from "obsidian";
 
-import type { EonicNotesSettings } from "../../settings";
-import type { EonicNode } from "../types";
+import type { EonicNode, EonicSchema } from "../types";
 
 import { countRows, getLeafNodes } from "../hierarchy";
 import { getContrastColor, withOpacity } from "../../utils/colors";
@@ -14,13 +13,9 @@ export function renderTable(
   app: App,
   container: HTMLElement,
   roots: EonicNode[],
-  settings: EonicNotesSettings,
+  schema: EonicSchema,
 ): () => void {
-  const hierarchy = settings.hierarchy.map((key) => key.trim()).filter(Boolean);
-
-  const optionalProperties = settings.optionalProperties
-    .map((key) => key.trim())
-    .filter(Boolean);
+  const { hierarchy, optionalProperties } = schema;
 
   const wrapper = container.createDiv({
     cls: "eonic-notes-table-wrapper",
@@ -30,28 +25,16 @@ export function renderTable(
     cls: "eonic-notes-table",
   });
 
-  const narrowColumnCount = Math.max(0, hierarchy.length - 2);
-
-  const wideColumnCount = hierarchy.length - narrowColumnCount;
-
-  const minTableWidth =
-    narrowColumnCount * 48 +
-    wideColumnCount * 110 +
-    optionalProperties.length * 160;
-
-  table.style.minWidth = `${minTableWidth}px`;
-
   // Define relative column widths.
+
   const colgroup = table.createEl("colgroup");
 
   for (let level = 0; level < hierarchy.length; level++) {
-    const column = colgroup.createEl("col");
+    const column = colgroup.createEl("col", {
+      cls: "eonic-notes-hierarchy-column",
+    });
 
-    if (level < hierarchy.length - 2) {
-      column.addClass("eonic-notes-narrow-column");
-    } else {
-      column.addClass("eonic-notes-wide-column");
-    }
+    column.dataset.level = String(level);
   }
 
   for (let i = 0; i < optionalProperties.length; i++) {
@@ -109,21 +92,10 @@ export function renderTable(
     const cell = row.createEl("td", {
       cls: "eonic-notes-hierarchy-cell",
     });
+    cell.dataset.level = String(node.level);
 
     cell.rowSpan = countRows(node);
     cell.colSpan = 1;
-
-    if (hasChildren) {
-      cell.addClass("eonic-notes-parent-cell");
-    } else {
-      cell.addClass("eonic-notes-terminal-cell");
-    }
-
-    // All higher hierarchy levels can use vertical labels,
-    // even when they have no children.
-    if (node.level < hierarchy.length - 2) {
-      cell.addClass("eonic-notes-adaptive-cell");
-    }
 
     const content = cell.createDiv({
       cls: "eonic-notes-cell-content",
@@ -205,5 +177,5 @@ export function renderTable(
     renderNode(root);
   }
 
-  return observeAdaptiveLabels(table);
+  return observeAdaptiveLabels(table, wrapper);
 }

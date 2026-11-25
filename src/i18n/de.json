@@ -42,6 +42,7 @@
     "noNotes": "Keine passenden eonischen Notizen gefunden.",
     "invalidOptions": "Ungültige Optionen im Eonic-Codeblock.",
     "unknownView": "Nicht unterstützte Eonic-Visualisierung.",
-    "emptyHierarchy": "Konfiguriere mindestens eine Hierarchieeigenschaft."
+    "emptyHierarchy": "Konfiguriere mindestens eine Hierarchieeigenschaft.",
+    "level": "Ebene"
   }
 }

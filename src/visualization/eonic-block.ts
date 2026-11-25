@@ -2,8 +2,9 @@ import { App, MarkdownRenderChild, parseYaml, debounce } from "obsidian";
 
 import type { EonicNotesSettings } from "../settings";
 import type { EonicBlockOptions } from "./types";
+import { collectRawEonicNotes, normalizeEonicNotes } from "./note-collector";
 
-import { collectEonicNotes } from "./note-collector";
+import { detectSchema } from "./schema-detector";
 import { buildHierarchy } from "./hierarchy";
 import { renderTable } from "./views/table-view";
 import { t } from "../i18n";
@@ -65,10 +66,23 @@ export class EonicBlock extends MarkdownRenderChild {
       throw new Error("Invalid order");
     }
 
+    if (
+      data.properties !== undefined &&
+      (!Array.isArray(data.properties) ||
+        !data.properties.every(
+          (value: unknown) =>
+            typeof value === "string" && value.trim().length > 0,
+        ))
+    ) {
+      throw new Error("Invalid properties");
+    }
+
     return {
       view: data.view ?? "table",
       tag: data.tag,
       order: data.order ?? "asc",
+
+      properties: data.properties?.map((key: string) => key.trim()),
     };
   }
 
@@ -90,13 +104,24 @@ export class EonicBlock extends MarkdownRenderChild {
 
     const settings = this.getSettings();
 
-    if (!settings.hierarchy.some((key) => key.trim())) {
-      this.showMessage(t("visualization.emptyHierarchy"));
+    // 1. Collect matching notes.
+    const rawNotes = collectRawEonicNotes(this.app, settings.tag, options.tag);
+
+    if (rawNotes.length === 0) {
+      this.showMessage(t("visualization.noNotes"));
 
       return;
     }
 
-    const notes = collectEonicNotes(this.app, settings, options.tag);
+    // 2. Discover this visualization's schema.
+    const schema = detectSchema(
+      rawNotes,
+      settings.hierarchy,
+      options.properties,
+    );
+
+    // 3. Normalize the notes.
+    const notes = normalizeEonicNotes(rawNotes, schema);
 
     if (notes.length === 0) {
       this.showMessage(t("visualization.noNotes"));
@@ -104,15 +129,17 @@ export class EonicBlock extends MarkdownRenderChild {
       return;
     }
 
+    // 4. Build and sort the hierarchy.
     const hierarchy = buildHierarchy(notes, options.order);
 
+    // 5. Render the selected visualization.
     switch (options.view) {
       case "table":
         this.cleanupView = renderTable(
           this.app,
           this.containerEl,
           hierarchy,
-          settings,
+          schema,
         );
 
         break;
