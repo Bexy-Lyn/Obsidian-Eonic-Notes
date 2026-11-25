@@ -269,3 +269,111 @@
   color: var(--text-muted);
   font-style: italic;
 }
+
+/* ========================================
+   Eonic timeline axis
+   ======================================== */
+
+.eonic-notes-table-wrapper {
+  padding-bottom: 12px;
+}
+
+/* Timeline cells */
+
+.eonic-notes-table-wrapper .eonic-notes-table td.eonic-notes-timeline-cell {
+  position: relative;
+
+  padding: 0 !important;
+
+  background: var(--background-primary);
+  color: var(--text-muted);
+
+  overflow: visible;
+
+  font-size: var(--font-ui-smaller);
+  font-weight: 500;
+}
+
+/* Continuous vertical axis */
+
+.eonic-notes-timeline-cell::before {
+  content: "";
+
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 6px;
+
+  width: 1px;
+
+  background: var(--text-muted);
+
+  pointer-events: none;
+}
+
+/* Boundary labels */
+
+.eonic-notes-timeline-marker {
+  position: absolute;
+  right: 16px;
+
+  width: max-content;
+
+  line-height: 1;
+  white-space: nowrap;
+  text-align: right;
+
+  font-variant-numeric: tabular-nums;
+
+  z-index: 1;
+}
+
+/* Beginning of a row */
+
+.eonic-notes-timeline-start {
+  top: 0;
+  transform: translateY(-50%);
+}
+
+/* End of the final row */
+
+.eonic-notes-timeline-end {
+  bottom: 0;
+  transform: translateY(50%);
+}
+
+/* Horizontal tick marks */
+
+.eonic-notes-timeline-marker::after {
+  content: "";
+
+  position: absolute;
+  top: 50%;
+  right: -14px;
+
+  width: 8px;
+  height: 1px;
+
+  background: var(--text-muted);
+}
+
+/* Timeline heading */
+
+.eonic-notes-table .eonic-notes-timeline-heading {
+  text-align: center;
+  white-space: nowrap;
+}
+
+/* Rounded corners */
+.eonic-notes-table > tbody > tr:first-child td:first-child {
+  border-top-left-radius: 2rem;
+}
+.eonic-notes-table > tbody > tr:first-child td:last-child {
+  border-top-right-radius: 2rem;
+}
+.eonic-notes-table > tbody > tr:last-child td:first-child {
+  border-bottom-left-radius: 2rem;
+}
+.eonic-notes-table > tbody > tr:last-child td:last-child {
+  border-bottom-right-radius: 2rem;
+}

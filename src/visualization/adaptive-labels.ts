@@ -6,6 +6,9 @@ const MIN_VERTICAL_WIDTH = 28;
 const MIN_HORIZONTAL_WIDTH = 80;
 const MIN_PROPERTY_WIDTH = 160;
 
+const MIN_TIMELINE_WIDTH = 48;
+const TIMELINE_MARKER_SPACE = 20;
+
 interface LabelMeasurement {
   cell: HTMLTableCellElement;
   width: number;
@@ -60,6 +63,14 @@ export function observeAdaptiveLabels(
     ),
   );
 
+  const timelineColumn = table.querySelector<HTMLTableColElement>(
+    "col.eonic-notes-timeline-column",
+  );
+
+  const allColumns = Array.from(
+    table.querySelectorAll<HTMLTableColElement>("colgroup col"),
+  );
+
   const headers = Array.from(
     table.querySelectorAll<HTMLTableCellElement>("thead th"),
   );
@@ -81,7 +92,7 @@ export function observeAdaptiveLabels(
     }
 
     // 2. Measure each hierarchy column.
-    const layouts: ColumnLayout[] = columns.map((column, index) => {
+    const layouts: ColumnLayout[] = columns.map((column) => {
       const level = column.dataset.level;
 
       const columnCells = cells.filter((cell) => cell.dataset.level === level);
@@ -101,7 +112,7 @@ export function observeAdaptiveLabels(
         });
       }
 
-      const header = headers[index];
+      const header = getHeader(column);
 
       const headerWidth = header ? measureElement(header).width + 8 : 0;
 
@@ -135,8 +146,8 @@ export function observeAdaptiveLabels(
 
     // Keep secondary columns flexible, but ensure
     // their headings have enough space.
-    const propertyWidths = propertyColumns.map((_, index) => {
-      const header = headers[columns.length + index];
+    const propertyWidths = propertyColumns.map((column) => {
+      const header = getHeader(column);
 
       return Math.max(
         MIN_PROPERTY_WIDTH,
@@ -144,8 +155,33 @@ export function observeAdaptiveLabels(
       );
     });
 
+    let timelineWidth = 0;
+
+    if (timelineColumn) {
+      const header = getHeader(timelineColumn);
+
+      const markers = Array.from(
+        table.querySelectorAll<HTMLElement>(".eonic-notes-timeline-marker"),
+      );
+
+      const maxMarkerWidth = Math.max(
+        0,
+        ...markers.map((marker) => measureElement(marker).width),
+      );
+
+      timelineWidth = Math.max(
+        MIN_TIMELINE_WIDTH,
+        header ? measureElement(header).width + 8 : 0,
+        maxMarkerWidth + TIMELINE_MARKER_SPACE,
+      );
+    }
+
     function applyLayout(): void {
-      let minTableWidth = 0;
+      let minTableWidth = timelineWidth;
+
+      if (timelineColumn) {
+        timelineColumn.style.width = `${timelineWidth}px`;
+      }
 
       for (const layout of layouts) {
         const width = layout.vertical
@@ -222,6 +258,12 @@ export function observeAdaptiveLabels(
         applyLayout();
       }
     } while (changed);
+  }
+
+  function getHeader(
+    column: HTMLTableColElement,
+  ): HTMLTableCellElement | undefined {
+    return headers[allColumns.indexOf(column)];
   }
 
   let frame: number | null = null;

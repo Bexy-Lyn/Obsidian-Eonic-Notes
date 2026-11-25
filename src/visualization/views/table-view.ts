@@ -1,6 +1,12 @@
 import type { App } from "obsidian";
 
-import type { EonicNode, EonicSchema } from "../types";
+import type { EonicNode, EonicSchema, EonicTimelineOptions } from "../types";
+
+import {
+  calculateTimeline,
+  resolveTimelineColumn,
+  insertTimelineCells,
+} from "../timeline";
 
 import { countRows, getLeafNodes } from "../hierarchy";
 import { getContrastColor, withOpacity } from "../../utils/colors";
@@ -14,8 +20,15 @@ export function renderTable(
   container: HTMLElement,
   roots: EonicNode[],
   schema: EonicSchema,
+  timeline?: EonicTimelineOptions,
 ): () => void {
   const { hierarchy, optionalProperties } = schema;
+
+  const columnCount = hierarchy.length + optionalProperties.length;
+
+  const timelineIndex = timeline
+    ? resolveTimelineColumn(timeline, columnCount)
+    : -1;
 
   const wrapper = container.createDiv({
     cls: "eonic-notes-table-wrapper",
@@ -43,7 +56,19 @@ export function renderTable(
     });
   }
 
+  if (timeline) {
+    const timelineColumn = createEl("col");
+
+    timelineColumn.addClass("eonic-notes-timeline-column");
+
+    colgroup.insertBefore(
+      timelineColumn,
+      colgroup.children[timelineIndex] ?? null,
+    );
+  }
+
   // Table headings
+
   const thead = table.createEl("thead");
   const headerRow = thead.createEl("tr");
 
@@ -51,6 +76,16 @@ export function renderTable(
     headerRow.createEl("th", {
       text: column,
     });
+  }
+
+  if (timeline) {
+    const header = createEl("th");
+
+    header.addClass("eonic-notes-timeline-heading");
+
+    header.setText(timeline.label);
+
+    headerRow.insertBefore(header, headerRow.children[timelineIndex] ?? null);
   }
 
   const tbody = table.createEl("tbody");
@@ -93,6 +128,7 @@ export function renderTable(
       cls: "eonic-notes-hierarchy-cell",
     });
     cell.dataset.level = String(node.level);
+    cell.dataset.column = String(node.level);
 
     cell.rowSpan = countRows(node);
     cell.colSpan = 1;
@@ -157,17 +193,21 @@ export function renderTable(
 
         continuation.colSpan = remainingColumns;
         continuation.style.backgroundColor = continuationColor;
+        continuation.dataset.column = String(node.level + 1);
       }
 
       // Optional properties inherit the row's color.
-      for (const property of optionalProperties) {
+
+      optionalProperties.forEach((property, index) => {
         const propertyCell = row.createEl("td", {
           text: node.note?.properties[property] ?? "",
           cls: "eonic-notes-property-cell",
         });
 
+        propertyCell.dataset.column = String(hierarchy.length + index);
+
         propertyCell.style.backgroundColor = continuationColor;
-      }
+      });
 
       rowIndex++;
     }
@@ -175,6 +215,12 @@ export function renderTable(
 
   for (const root of roots) {
     renderNode(root);
+  }
+
+  if (timeline) {
+    const intervals = calculateTimeline(leaves, timeline.start);
+
+    insertTimelineCells(rows, intervals, timelineIndex);
   }
 
   return observeAdaptiveLabels(table, wrapper);

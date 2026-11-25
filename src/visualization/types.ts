@@ -5,6 +5,7 @@ export interface EonicBlockOptions {
   tag?: string;
   order: EonicSortOrder;
   properties?: string[];
+  timeline?: EonicTimelineOptions;
 }
 
 export interface EonicNote {
@@ -53,4 +54,10 @@ export interface RawEonicNote {
 export interface EonicSchema {
   hierarchy: string[];
   optionalProperties: string[];
+}
+
+export interface EonicTimelineOptions {
+  label: string;
+  start: number;
+  column: number;
 }

@@ -43,6 +43,7 @@
     "invalidOptions": "Ungültige Optionen im Eonic-Codeblock.",
     "unknownView": "Nicht unterstützte Eonic-Visualisierung.",
     "emptyHierarchy": "Konfiguriere mindestens eine Hierarchieeigenschaft.",
-    "level": "Ebene"
+    "level": "Ebene",
+    "duration": "Dauer"
   }
 }

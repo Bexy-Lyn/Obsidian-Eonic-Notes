@@ -1,7 +1,7 @@
 import { App, MarkdownRenderChild, parseYaml, debounce } from "obsidian";
 
 import type { EonicNotesSettings } from "../settings";
-import type { EonicBlockOptions } from "./types";
+import type { EonicBlockOptions, EonicTimelineOptions } from "./types";
 import { collectRawEonicNotes, normalizeEonicNotes } from "./note-collector";
 
 import { detectSchema } from "./schema-detector";
@@ -39,6 +39,42 @@ export class EonicBlock extends MarkdownRenderChild {
   onunload(): void {
     this.cleanupView?.();
     this.cleanupView = undefined;
+  }
+
+  private parseTimeline(value: unknown): EonicTimelineOptions | undefined {
+    // Timeline is disabled when omitted.
+    if (value === undefined) {
+      return undefined;
+    }
+
+    if (value === null || typeof value !== "object" || Array.isArray(value)) {
+      throw new Error("Invalid timeline options");
+    }
+
+    const data = value as Record<string, unknown>;
+
+    const label =
+      typeof data.label === "string" && data.label.trim().length > 0
+        ? data.label.trim()
+        : t("visualization.duration");
+
+    const start =
+      typeof data.start === "number" && Number.isFinite(data.start)
+        ? data.start
+        : 0;
+
+    const column =
+      typeof data.column === "number" &&
+      Number.isInteger(data.column) &&
+      data.column >= 1
+        ? data.column
+        : 1;
+
+    return {
+      label,
+      start,
+      column,
+    };
   }
 
   private parseOptions(): EonicBlockOptions {
@@ -83,6 +119,8 @@ export class EonicBlock extends MarkdownRenderChild {
       order: data.order ?? "asc",
 
       properties: data.properties?.map((key: string) => key.trim()),
+
+      timeline: this.parseTimeline(data.timeline),
     };
   }
 
@@ -140,6 +178,7 @@ export class EonicBlock extends MarkdownRenderChild {
           this.containerEl,
           hierarchy,
           schema,
+          options.timeline,
         );
 
         break;
