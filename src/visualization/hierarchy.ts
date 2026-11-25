@@ -1,6 +1,9 @@
-import type { EonicNote, EonicNode } from "./types";
+import type { EonicNote, EonicNode, EonicSortOrder } from "./types";
 
-export function buildHierarchy(notes: EonicNote[]): EonicNode[] {
+export function buildHierarchy(
+  notes: EonicNote[],
+  order: EonicSortOrder = "asc",
+): EonicNode[] {
   const roots: EonicNode[] = [];
 
   for (const note of notes) {
@@ -31,25 +34,34 @@ export function buildHierarchy(notes: EonicNote[]): EonicNode[] {
     }
   }
 
-  sortHierarchy(roots);
+  sortHierarchy(roots, order);
 
   return roots;
 }
 
-function sortHierarchy(nodes: EonicNode[]): void {
+function sortHierarchy(nodes: EonicNode[], order: EonicSortOrder): void {
+  const direction = order === "desc" ? -1 : 1;
+
   nodes.sort((a, b) => {
-    const orderA = a.note?.order ?? Infinity;
-    const orderB = b.note?.order ?? Infinity;
+    // Keep placeholder nodes after actual notes,
+    // regardless of the sorting direction.
+    if (!a.note && b.note) return 1;
+    if (a.note && !b.note) return -1;
+
+    const orderA = a.note?.order ?? 0;
+    const orderB = b.note?.order ?? 0;
 
     if (orderA !== orderB) {
-      return orderA - orderB;
+      return (orderA - orderB) * direction;
     }
 
-    return a.title.localeCompare(b.title);
+    // Alphabetical fallback for equal order values.
+    return a.title.localeCompare(b.title) * direction;
   });
 
+  // Apply the same sorting direction recursively.
   for (const node of nodes) {
-    sortHierarchy(node.children);
+    sortHierarchy(node.children, order);
   }
 }
 

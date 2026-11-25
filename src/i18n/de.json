@@ -27,7 +27,8 @@
     "order": "Reihenfolge",
     "created": "Hierarchische Notiz erstellt",
     "creationFailed": "Hierarchische Notiz konnte nicht erstellt werden",
-    "color": "Hintergrundfarbe"
+    "color": "Hintergrundfarbe",
+    "description": "Beschreibung"
   },
   "colorEditor": {
     "command": "Farbe der hierarchischen Notiz bearbeiten",

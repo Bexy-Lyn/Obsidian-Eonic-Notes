@@ -14,6 +14,7 @@ export class EonicBlock extends MarkdownRenderChild {
     private app: App,
     private source: string,
     private getSettings: () => EonicNotesSettings,
+    private cleanupView?: () => void,
   ) {
     super(containerEl);
   }
@@ -34,6 +35,11 @@ export class EonicBlock extends MarkdownRenderChild {
     this.register(() => refresh.cancel());
   }
 
+  onunload(): void {
+    this.cleanupView?.();
+    this.cleanupView = undefined;
+  }
+
   private parseOptions(): EonicBlockOptions {
     const parsed = this.source.trim() ? parseYaml(this.source) : {};
 
@@ -51,13 +57,25 @@ export class EonicBlock extends MarkdownRenderChild {
       throw new Error("Invalid tag");
     }
 
+    if (
+      data.order !== undefined &&
+      data.order !== "asc" &&
+      data.order !== "desc"
+    ) {
+      throw new Error("Invalid order");
+    }
+
     return {
       view: data.view ?? "table",
       tag: data.tag,
+      order: data.order ?? "asc",
     };
   }
 
   private render(): void {
+    this.cleanupView?.();
+    this.cleanupView = undefined;
+
     this.containerEl.empty();
 
     let options: EonicBlockOptions;
@@ -86,11 +104,16 @@ export class EonicBlock extends MarkdownRenderChild {
       return;
     }
 
-    const hierarchy = buildHierarchy(notes);
+    const hierarchy = buildHierarchy(notes, options.order);
 
     switch (options.view) {
       case "table":
-        renderTable(this.app, this.containerEl, hierarchy, settings);
+        this.cleanupView = renderTable(
+          this.app,
+          this.containerEl,
+          hierarchy,
+          settings,
+        );
 
         break;
 

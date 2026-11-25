@@ -101,6 +101,7 @@ export function collectEonicNotes(
     notes.push({
       file,
       title: file.basename,
+      description: readText(fm.description),
       ancestors,
       level: ancestors.length,
 

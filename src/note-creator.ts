@@ -41,11 +41,13 @@ export class EonicNoteCreator {
         }
       }
 
-      // Numeric properties.
+      // Numeric properties
       frontmatter.duration = 0;
       frontmatter.order = 1;
       // Visual appearance
       frontmatter.color = "#909090";
+      // Optional description displayed below the title
+      frontmatter.description = "";
     });
 
     return file;

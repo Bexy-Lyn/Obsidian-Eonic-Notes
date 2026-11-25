@@ -27,7 +27,8 @@
     "order": "Order",
     "created": "Hierarchical note created",
     "creationFailed": "Could not create hierarchical note",
-    "color": "Background color"
+    "color": "Background color",
+    "description": "Description"
   },
   "colorEditor": {
     "command": "Edit hierarchical note color",
